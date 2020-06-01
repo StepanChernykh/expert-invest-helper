@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { QuestionAndProjectStatistic } from './QuestionAndProjectStatistic';
 
 @Entity()
 export class Project {
@@ -9,4 +11,6 @@ export class Project {
     @Column('text', { name: 'project_name', unique: true, nullable: false })
     public projectName: string;
 
+    @OneToMany(type => QuestionAndProjectStatistic, questionAndProjectStatistic => questionAndProjectStatistic.question)
+    public statistics: QuestionAndProjectStatistic[];
 }

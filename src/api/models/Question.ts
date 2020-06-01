@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { QuestionAndProjectStatistic } from './QuestionAndProjectStatistic';
 
 @Entity()
 export class Question {
@@ -12,4 +14,6 @@ export class Question {
     // @Column('simple-json')
     // public answers: string[]; //TODO скорее всего лучше сделать фиксированный список ответов (да, нет, не знаю, возможно частично, скорее всего нет)
 
+    @OneToMany(type => QuestionAndProjectStatistic, questionAndProjectStatistic => questionAndProjectStatistic.question)
+    public statistics: QuestionAndProjectStatistic[];
 }
