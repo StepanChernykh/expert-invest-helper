@@ -8,6 +8,7 @@ import { eventDispatchLoader } from './loaders/eventDispatchLoader';
 import { expressLoader } from './loaders/expressLoader';
 // import { graphqlLoader } from './loaders/graphqlLoader';
 import { homeLoader } from './loaders/homeLoader';
+import { insertLoader } from './loaders/insertLoader';
 import { iocLoader } from './loaders/iocLoader';
 import { monitorLoader } from './loaders/monitorLoader';
 import { publicLoader } from './loaders/publicLoader';
@@ -40,6 +41,7 @@ bootstrapMicroframework({
         monitorLoader,
         homeLoader,
         publicLoader,
+        insertLoader,
         // graphqlLoader,
     ],
 })

@@ -1,13 +1,11 @@
-import {
-    Authorized, Body, Delete, Get, JsonController, Param, Post, Put
-} from 'routing-controllers';
+import { Body, Delete, Get, JsonController, Param, Post, Put } from 'routing-controllers';
 import { DeleteResult, UpdateResult } from 'typeorm';
 
 import { Question } from '../models/Question';
 import { QuestionService } from '../services/QuestionService';
-import { CreateNewQuestionRequest } from './requests/CreateNewQuestionRequest';
+import { CreateOrUpdateQuestionRequest } from './requests/CreateOrUpdateQuestionRequest';
 
-@Authorized()
+// @Authorized()
 @JsonController('/question')
 export class QuestionController {
 
@@ -26,12 +24,12 @@ export class QuestionController {
     }
 
     @Post()
-    public create(@Body({ validate: true }) body: CreateNewQuestionRequest): Promise<Question> {
+    public create(@Body({ validate: true }) body: CreateOrUpdateQuestionRequest): Promise<Question> {
         return this.questionService.create(body);
     }
 
     @Put('/:id')
-    public update(@Param('id') id: string, @Body({ validate: true }) body: CreateNewQuestionRequest): Promise<UpdateResult> {
+    public update(@Param('id') id: string, @Body({ validate: true }) body: CreateOrUpdateQuestionRequest): Promise<UpdateResult> {
         return this.questionService.update(Number(id), body);
     }
 

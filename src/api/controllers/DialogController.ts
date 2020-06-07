@@ -1,10 +1,12 @@
-import { Authorized, Body, Get, JsonController, Post } from 'routing-controllers';
+import { Body, Get, JsonController, Post } from 'routing-controllers';
 
 import { Dialog } from '../models/Dialog';
+import { Project } from '../models/Project';
 import { DialogService } from '../services/DialogService';
+import { FinishDialogRequest } from './requests/FinishDialogRequest';
 import { SaveAnswerForQuestionRequest } from './requests/SaveAnswerForQuestionRequest';
 
-@Authorized()
+// @Authorized()
 @JsonController('/dialog')
 export class DialogController {
 
@@ -17,9 +19,14 @@ export class DialogController {
         return this.dialogService.startDialog();
     }
 
-    @Post('/answer-and-next')
-    public saveAnswerForQuestionAndGetNextQuestion(@Body() body: SaveAnswerForQuestionRequest): Promise<Dialog> {
+    @Post('/answer-and-next-question')
+    public saveAnswerForQuestionAndGetNextQuestion(@Body() body: SaveAnswerForQuestionRequest): Promise<Dialog | Project[]> {
         return this.dialogService.saveAnswerForQuestionAndGetNextQuestion(body);
+    }
+
+    @Post('/finish')
+    public finishDialog(@Body() body: FinishDialogRequest): Promise<any> {
+        return this.dialogService.finishDialog(body);
     }
 
 }

@@ -68,6 +68,7 @@
     "nps-utils": "^1.5.0",
     "pg": "^7.4.3",
     "reflect-metadata": "^0.1.10",
+    "request-promise": "^4.2.5",
     "routing-controllers": "^0.7.6",
     "serve-favicon": "^2.4.5",
     "supertest": "^3.0.0",

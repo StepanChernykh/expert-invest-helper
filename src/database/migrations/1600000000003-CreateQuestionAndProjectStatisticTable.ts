@@ -11,8 +11,43 @@ export class CreateQuestionAndProjectStatisticTable1600000000003 implements Migr
                 isPrimary: true,
                 isNullable: false,
             }, {
+                name: 'yes_counter',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+                default: 0,
+            }, {
+                name: 'partially_possible_counter',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+                default: 0,
+            }, {
+                name: 'probably_not_counter',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+                default: 0,
+            }, {
+                name: 'no_counter',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+                default: 0,
+            }, {
+                name: 'i_don_not_know_counter',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+                default: 0,
+            }, {
                 name: 'project_id',
-                type: 'number',
+                type: 'integer',
+                isPrimary: false,
+                isNullable: false,
+            }, {
+                name: 'question_id',
+                type: 'integer',
                 isPrimary: false,
                 isNullable: false,
             },
@@ -20,7 +55,7 @@ export class CreateQuestionAndProjectStatisticTable1600000000003 implements Migr
     });
 
     private tableForeignKeyForProject = new TableForeignKey({
-        name: 'fk_project_question_and_project_statistic',
+        name: 'fk_project_question_and_project_statistic_project',
         columnNames: ['project_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'project',
@@ -28,7 +63,7 @@ export class CreateQuestionAndProjectStatisticTable1600000000003 implements Migr
     });
 
     private tableForeignKeyForQuestion = new TableForeignKey({
-        name: 'fk_question_question_and_project_statistic',
+        name: 'fk_question_question_and_project_statistic_question',
         columnNames: ['question_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'question',

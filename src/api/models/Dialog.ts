@@ -2,6 +2,12 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 
 import { Question, QuestionAnswerEnum } from './Question';
 
+export enum DialogStatusEnum {
+    start = 'start',
+    process = 'process',
+    finish = 'finish',
+}
+
 @Entity()
 export class Dialog {
 
@@ -11,8 +17,14 @@ export class Dialog {
     @Column()
     public token: string;
 
+    @Column('text')
+    public status: DialogStatusEnum;
+
     @Column('simple-json')
     public history: Array<{ question: Question, answer: QuestionAnswerEnum }>;
+
+    @Column('simple-json')
+    public projectsRating: Array<{ projectId: number, rating: number }>;
 
     @Column({
         name: 'current_question_id',

@@ -9,11 +9,20 @@ export class QuestionAndProjectStatistic {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @Column({ name: 'positive_counter', nullable: false, default: 0 })
-    public positiveCounter: number;
+    @Column({ name: 'yes_counter', nullable: false, default: 0 })
+    public yesCounter: number;
 
-    @Column({ name: 'negative_counter', nullable: false, default: 0 })
-    public negativeCounter: number;
+    @Column({ name: 'partially_possible_counter', nullable: false, default: 0 })
+    public partiallyPossibleCounter: number;
+
+    @Column({ name: 'probably_not_counter', nullable: false, default: 0 })
+    public probablyNotCounter: number;
+
+    @Column({ name: 'no_counter', nullable: false, default: 0 })
+    public noCounter: number;
+
+    @Column({ name: 'i_don_not_know_counter', nullable: false, default: 0 })
+    public iDonNotKnowCounter: number;
 
     @Column({
         name: 'project_id',
@@ -29,7 +38,7 @@ export class QuestionAndProjectStatistic {
         name: 'question_id',
         nullable: false,
     })
-    public questionId: string;
+    public questionId: number;
 
     @ManyToOne(type => Question, question => question.statistics)
     @JoinColumn({ name: 'question_id' })
