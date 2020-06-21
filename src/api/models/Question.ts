@@ -5,10 +5,10 @@ import { QuestionAndProjectStatistic } from './QuestionAndProjectStatistic';
 
 export enum QuestionAnswerEnum {
     yes = 'Да',
-    no = 'Нет',
     partially_possible = 'Возможно частично',
-    i_don_not_know = 'я не знаю',
     probably_not = 'Скорее всего нет',
+    no = 'Нет',
+    i_don_not_know = 'я не знаю',
 }
 
 @Entity()

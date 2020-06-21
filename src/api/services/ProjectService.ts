@@ -57,6 +57,7 @@ export class ProjectService {
             if (projectsFromDB.find(y => y.projectName === x.name ) === undefined) {
                 const project = new Project();
                 project.projectName = x.name;
+                project.weight = 1; // TODO логика установки начального веса проекта (в дальнейшем - априорной вероятности P(A) для проекта)
                 projects.push(project);
             }
         });
@@ -83,7 +84,7 @@ export class ProjectService {
     public async getStartProjectRatings(): Promise<Array<{ projectId: number, rating: number }>> {
         const projects = await this.projectRepository.find();
         // tslint:disable-next-line:arrow-return-shorthand
-        return projects.map(x => { return { projectId: x.id, rating: 1 / projects.length }; });
+        return projects.map(x => { return { projectId: x.id, rating: x.weight / projects.length }; });
     }
 
 }

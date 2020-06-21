@@ -13,6 +13,10 @@ import { QuestionAnswerEnum } from '../models/Question';
 import { QuestionAndProjectStatistic } from '../models/QuestionAndProjectStatistic';
 import { DialogRepository } from '../repositories/DialogRepository';
 import { ProjectRepository } from '../repositories/ProjectRepository';
+import {
+    QuestionAndProjectStatisticRepository
+} from '../repositories/QuestionAndProjectStatisticRepository';
+import { QuestionRepository } from '../repositories/QuestionRepository';
 import { ProjectService } from './ProjectService';
 import { QuestionService } from './QuestionService';
 
@@ -25,6 +29,8 @@ export class DialogService {
         // @OrmRepository() private questionRepository: QuestionRepository,
         @OrmRepository() private dialogRepository: DialogRepository,
         @OrmRepository() private projectRepository: ProjectRepository,
+        @OrmRepository() private questionRepository: QuestionRepository,
+        @OrmRepository() private questionAndProjectStatisticRepository: QuestionAndProjectStatisticRepository,
         // @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
         // @Logger(__filename) private log: LoggerInterface
         private questionService: QuestionService,
@@ -46,9 +52,10 @@ export class DialogService {
     public async saveAnswerForQuestionAndGetNextQuestion(body: SaveAnswerForQuestionRequest): Promise<Dialog | Project[]> {
         let dialog = await this.dialogRepository.findOne({ where: { token: body.token }, relations: ['currentQuestion']});
         dialog.history.push({ question: dialog.currentQuestion, answer: body.answer });
-        dialog.projectsRating = await this.recalculateRating(dialog.projectsRating, dialog.currentQuestion, body.answer);
+        dialog.projectsRating = await this.recalculateRating(dialog);
         const significantProjects = await this.getSignificantProjects(dialog, 0.9);
-        if (significantProjects.length < 3) {
+        const allQuestionsAmount = await this.questionRepository.count();
+        if (significantProjects.length < 3 || dialog.history.length === allQuestionsAmount) {
             dialog.status = DialogStatusEnum.finish;
             dialog.currentQuestionId = undefined;
             await this.dialogRepository.save(dialog);
@@ -119,6 +126,41 @@ export class DialogService {
            result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
+    }
+
+    private async recalculateRating(
+        dialog: Dialog
+    ): Promise<Array<{ projectId: number, rating: number }>> {
+        const newProjectRatings = new Array<{ projectId: number, rating: number }>();
+        /*for (const {projectId, rating} of dialog.projectsRating) {
+            const projectStatistics = await this.questionAndProjectStatisticRepository.find({ projectId });
+            const allAmountOfDialogsWithProject = projectStatistics.reduce((amountOfDialogs, prevStat) =>
+                amountOfDialogs +
+                    prevStat.yesCounter +
+                    prevStat.partiallyPossibleCounter +
+                    prevStat.probablyNotCounter +
+                    prevStat.noCounter +
+                    prevStat.iDonNotKnowCounter,
+                0
+            );
+            let amountOfDialogsWithProjectWithQuestion = 0;
+            for (const {question, answer} of dialog.history) {
+                amountOfDialogsWithProjectWithQuestion += projectStatistics.find(x => x.questionId === question.id)[answer];
+            }
+
+            newProjectRatings.push({ projectId, rating: newRating });
+        }*/
+        for (const {projectId} of dialog.projectsRating) {
+            let positiveAmount = 0;
+            let allAmount = 0;
+            for (const {question, answer} of dialog.history) {
+                const questionStatistics = await this.questionAndProjectStatisticRepository.find({ questionId: question.id });
+                positiveAmount += questionStatistics.find(x => x.projectId === projectId)[answer];
+                allAmount += questionStatistics.reduce((sum, prevStat) => sum + prevStat[answer], 0);
+            }
+            newProjectRatings.push({ projectId, rating: positiveAmount / allAmount });
+        }
+        return newProjectRatings;
     }
 
 }

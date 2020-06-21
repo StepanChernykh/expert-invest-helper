@@ -9,6 +9,9 @@ import {
 } from '../controllers/requests/CreateOrUpdateQuestionRequest';
 import { Dialog } from '../models/Dialog';
 import { Question } from '../models/Question';
+import {
+    QuestionAndProjectStatisticRepository
+} from '../repositories/QuestionAndProjectStatisticRepository';
 import { QuestionRepository } from '../repositories/QuestionRepository';
 
 // import { events } from '../subscribers/events';
@@ -17,7 +20,8 @@ import { QuestionRepository } from '../repositories/QuestionRepository';
 export class QuestionService {
 
     constructor(
-        @OrmRepository() private questionRepository: QuestionRepository
+        @OrmRepository() private questionRepository: QuestionRepository,
+        @OrmRepository() private questionAndProjectStatisticRepository: QuestionAndProjectStatisticRepository
         // @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
         // @Logger(__filename) private log: LoggerInterface
     ) { }
@@ -53,6 +57,19 @@ export class QuestionService {
             where: { id: Not(In(dialog.history.map(x => x.question.id))),
         }});
         return notAnsweredQuestions[Math.floor(Math.random() * notAnsweredQuestions.length)];
+
+        // P(B|Ai) - вероятность получение конкретного набора пар вопрос/ответ при условии истинности гипотезы Ai;
+        // P(B|Ai) равна произведению (по j) вероятностей P(Bj|Ai), где Bj — событие вида «На вопрос Qj был дан ответ Oj»
+        let PBAi = 1;
+
+        const projectStatistics = await this.questionAndProjectStatisticRepository.find({ where: { projectId }});
+        for (const projectStatistic of projectStatistics) {
+            // P(Bj|Ai) - отношение числа раз, когда при предлагаемом проекте i на вопрос Qj был дан ответ Oj к числу раз,
+            // когда при предлагаемом проекте i был задан вопрос Qj.
+            const currStat = await this.questionAndProjectStatisticRepository.findOne({ where: { projectId, questionId: question.id }});
+            const PBjAi = projectStatistic[answer] / projectStatistic.getSumAnswers();
+            PBAi *= PBjAi;
+        }
     }
 
 }

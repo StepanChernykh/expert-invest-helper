@@ -17,6 +17,11 @@ export class CreateProjectTable1600000000002 implements MigrationInterface {
                     isPrimary: false,
                     isNullable: false,
                     isUnique: true,
+                }, {
+                    name: 'weight',
+                    type: 'float',
+                    isPrimary: false,
+                    isNullable: false,
                 },
             ],
         });

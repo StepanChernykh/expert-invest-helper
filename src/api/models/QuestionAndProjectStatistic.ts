@@ -44,4 +44,8 @@ export class QuestionAndProjectStatistic {
     @JoinColumn({ name: 'question_id' })
     public question: Question;
 
+    public getSumAnswers(): number {
+        return this.yesCounter + this.partiallyPossibleCounter + this.probablyNotCounter + this.noCounter + this.iDonNotKnowCounter;
+    }
+
 }
