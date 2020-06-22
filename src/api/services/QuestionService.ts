@@ -8,7 +8,8 @@ import {
     CreateOrUpdateQuestionRequest
 } from '../controllers/requests/CreateOrUpdateQuestionRequest';
 import { Dialog } from '../models/Dialog';
-import { Question } from '../models/Question';
+import { Question, QuestionAnswerEnum } from '../models/Question';
+import { QuestionAndProjectStatistic } from '../models/QuestionAndProjectStatistic';
 import {
     QuestionAndProjectStatisticRepository
 } from '../repositories/QuestionAndProjectStatisticRepository';
@@ -58,18 +59,36 @@ export class QuestionService {
         }});
         return notAnsweredQuestions[Math.floor(Math.random() * notAnsweredQuestions.length)];
 
-        // P(B|Ai) - вероятность получение конкретного набора пар вопрос/ответ при условии истинности гипотезы Ai;
-        // P(B|Ai) равна произведению (по j) вероятностей P(Bj|Ai), где Bj — событие вида «На вопрос Qj был дан ответ Oj»
-        let PBAi = 1;
+        const allStatistic = await this.questionAndProjectStatisticRepository.find();\
+        /** Map projectId->questionAndProjectStatistics */
+        const statisticsByProjects = new Map<number, QuestionAndProjectStatistic[]>();
+        allStatistic.forEach(x => {
+            const statisticsByProject = statisticsByProjects.get(x.projectId);
+            if (statisticsByProject === undefined) {
+                statisticsByProjects.set(x.projectId, [x]);
+            } else {
+                statisticsByProject.push(x);
+                statisticsByProjects.set(x.projectId, statisticsByProject);
+            }
+        });
 
-        const projectStatistics = await this.questionAndProjectStatisticRepository.find({ where: { projectId }});
-        for (const projectStatistic of projectStatistics) {
-            // P(Bj|Ai) - отношение числа раз, когда при предлагаемом проекте i на вопрос Qj был дан ответ Oj к числу раз,
-            // когда при предлагаемом проекте i был задан вопрос Qj.
-            const currStat = await this.questionAndProjectStatisticRepository.findOne({ where: { projectId, questionId: question.id }});
-            const PBjAi = projectStatistic[answer] / projectStatistic.getSumAnswers();
-            PBAi *= PBjAi;
+        const PBAiArray = new Array<{ projectId: number, PBAi: number }>();
+        for (const [projectId, statistic] of statisticsByProjects) {
+            // P(B|Ai) - вероятность получение конкретного набора пар вопрос/ответ при условии истинности гипотезы Ai;
+            // P(B|Ai) равна произведению (по j) вероятностей P(Bj|Ai), где Bj — событие вида «На вопрос Qj был дан ответ Oj»
+            let PBAi = 1;
+            for (const projectStatistic of statistic) {
+                // P(Bj|Ai) - отношение числа раз, когда при предлагаемом проекте i на вопрос Qj был дан ответ Oj к числу раз,
+                // когда при предлагаемом проекте i был задан вопрос Qj.
+                for (const key of Object.keys(QuestionAnswerEnum)) {
+                    const PBjkAi = projectStatistic[key] / projectStatistic.getSumAnswers();
+                    PBAi *= PBjkAi;
+                }
+            }
+            PBAiArray.push({ projectId, PBAi });
         }
+
+        const PAiB = (PBAiArray.find(x => x.projectId === 'projectId').PBAi * PAi) / (PBAiArray.reduce((acc, prev) => acc + prev.PBAi * PAiSTRICH, 0));
     }
 
 }
