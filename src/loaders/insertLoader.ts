@@ -1,9 +1,9 @@
 import { MicroframeworkLoader, MicroframeworkSettings } from 'microframework-w3tec';
-import { Project } from 'src/api/models/Project';
-import { QuestionAndProjectStatistic } from 'src/api/models/QuestionAndProjectStatistic';
 import { getConnection } from 'typeorm';
 
+import { Project } from '../api/models/Project';
 import { Question } from '../api/models/Question';
+import { QuestionAndProjectStatistic } from '../api/models/QuestionAndProjectStatistic';
 
 export const insertLoader: MicroframeworkLoader = async (settings: MicroframeworkSettings | undefined) => {
 

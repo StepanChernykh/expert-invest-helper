@@ -37,6 +37,10 @@ export class DialogService {
         private projectService: ProjectService
     ) { }
 
+    public async findByToken(token: string): Promise<Dialog> {
+        return await this.dialogRepository.findOne({ where: { token }, relations: ['currentQuestion']});
+    }
+
     public async startDialog(): Promise<Dialog> {
         let dialog = new Dialog();
         dialog.status = DialogStatusEnum.start;
@@ -154,9 +158,10 @@ export class DialogService {
             let positiveAmount = 0;
             let allAmount = 0;
             for (const {question, answer} of dialog.history) {
+                console.log(question, answer);
                 const questionStatistics = await this.questionAndProjectStatisticRepository.find({ questionId: question.id });
-                positiveAmount += questionStatistics.find(x => x.projectId === projectId)[answer];
-                allAmount += questionStatistics.reduce((sum, prevStat) => sum + prevStat[answer], 0);
+                positiveAmount += questionStatistics.find(x => x.projectId === projectId).getCounterByAnswerEnum(answer);
+                allAmount += questionStatistics.reduce((sum, prevStat) => sum + prevStat.getCounterByAnswerEnum(answer), 0);
             }
             newProjectRatings.push({ projectId, rating: positiveAmount / allAmount });
         }

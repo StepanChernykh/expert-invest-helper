@@ -4,11 +4,16 @@ import { Dialog } from './Dialog';
 import { QuestionAndProjectStatistic } from './QuestionAndProjectStatistic';
 
 export enum QuestionAnswerEnum {
-    yes = 'Да',
-    partially_possible = 'Возможно частично',
-    probably_not = 'Скорее всего нет',
-    no = 'Нет',
-    i_don_not_know = 'я не знаю',
+    // yes = 'Да',
+    // partially_possible = 'Возможно частично',
+    // probably_not = 'Скорее всего нет',
+    // no = 'Нет',
+    // i_don_not_know = 'я не знаю',
+    yes = 'yes',
+    partially_possible = 'partially_possible',
+    probably_not = 'probably_not',
+    no = 'no',
+    i_don_not_know = 'i_don_not_know',
 }
 
 @Entity()

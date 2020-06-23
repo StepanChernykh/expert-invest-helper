@@ -1,4 +1,4 @@
-import { Body, Get, JsonController, Post } from 'routing-controllers';
+import { Body, Get, JsonController, Param, Post } from 'routing-controllers';
 
 import { Dialog } from '../models/Dialog';
 import { Project } from '../models/Project';
@@ -14,7 +14,12 @@ export class DialogController {
         private dialogService: DialogService
     ) { }
 
-    @Get('/start')
+    @Get('/token/:token')
+    public one(@Param('token') token: string): Promise<Dialog> {
+        return this.dialogService.findByToken(token);
+    }
+
+    @Post('/start')
     public startDialog(): Promise<Dialog> {
         return this.dialogService.startDialog();
     }

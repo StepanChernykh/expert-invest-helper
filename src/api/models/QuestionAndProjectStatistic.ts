@@ -1,7 +1,8 @@
+import { HttpError } from 'routing-controllers';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Project } from './Project';
-import { Question } from './Question';
+import { Question, QuestionAnswerEnum } from './Question';
 
 @Entity()
 export class QuestionAndProjectStatistic {
@@ -46,6 +47,23 @@ export class QuestionAndProjectStatistic {
 
     public getSumAnswers(): number {
         return this.yesCounter + this.partiallyPossibleCounter + this.probablyNotCounter + this.noCounter + this.iDonNotKnowCounter;
+    }
+
+    public getCounterByAnswerEnum(answer: QuestionAnswerEnum): number {
+        switch (answer) {
+            case QuestionAnswerEnum.yes:
+                return this.yesCounter;
+            case QuestionAnswerEnum.partially_possible:
+                return this.partiallyPossibleCounter;
+            case QuestionAnswerEnum.probably_not:
+                return this.probablyNotCounter;
+            case QuestionAnswerEnum.no:
+                return this.noCounter;
+            case QuestionAnswerEnum.i_don_not_know:
+                return this.iDonNotKnowCounter;
+            default:
+                throw new HttpError(500, `incorrect answer in getCounterByAnswerEnum: ${answer}`);
+        }
     }
 
 }
